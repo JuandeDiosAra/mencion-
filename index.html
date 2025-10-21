@@ -3,513 +3,435 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Para Araceli</title>
+    <title>Simulador Macroeconómico - Banco Central</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #ff9a9e, #fad0c4, #fad0c4, #a18cd1);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
-            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
-            color: #333;
-        }
-
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            padding: 20px;
         }
 
         .container {
-            text-align: center;
-            background-color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            max-width: 500px;
-            width: 90%;
-            position: relative;
-            z-index: 10;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
         }
 
         h1 {
-            color: #e91e63;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 25px;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .control-group {
             margin-bottom: 20px;
-            font-size: 2.2rem;
         }
 
-        p {
-            margin-bottom: 20px;
-            font-size: 1.1rem;
-            line-height: 1.5;
+        .control-group h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
         }
 
-        .game-container {
-            margin: 25px 0;
-            position: relative;
-            height: 300px;
-            border: 2px dashed #e91e63;
-            border-radius: 10px;
-            overflow: hidden;
-            background-color: rgba(255, 255, 255, 0.7);
+        .slider-container {
+            margin-bottom: 15px;
         }
 
-        #basket {
-            position: absolute;
-            bottom: 10px;
-            width: 80px;
-            height: 40px;
-            background-color: #e91e63;
-            border-radius: 10px 10px 0 0;
-            cursor: pointer;
-            transition: all 0.1s;
-        }
-
-        .heart {
-            position: absolute;
-            font-size: 24px;
-            color: #e91e63;
-            user-select: none;
-            animation: pulse 1s infinite;
-        }
-
-        .bomb {
-            position: absolute;
-            font-size: 24px;
-            color: #333;
-            user-select: none;
-            animation: rotate 2s infinite linear;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .score-container {
+        .slider-label {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
-            font-weight: bold;
-            font-size: 1.2rem;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
         }
 
-        button {
-            background-color: #e91e63;
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #dee2e6;
+            outline: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .slider:hover {
+            opacity: 1;
+        }
+
+        .results {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .kpi {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .kpi h4 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 1em;
+        }
+
+        .kpi-value {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .positive { color: #27ae60; }
+        .negative { color: #e74c3c; }
+        .neutral { color: #f39c12; }
+
+        .alert {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+            color: #856404;
+        }
+
+        .time-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .quarter {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 12px 25px;
-            font-size: 1.1rem;
-            border-radius: 50px;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
             cursor: pointer;
-            transition: all 0.3s;
-            margin: 10px 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+            display: block;
+            margin: 20px auto 0;
         }
 
-        button:hover {
-            background-color: #c2185b;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        .next-btn:hover {
+            transform: translateY(-2px);
         }
 
-        #message {
-            display: none;
+        .indicators {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
             margin-top: 20px;
+        }
+
+        .indicator {
+            text-align: center;
             padding: 15px;
-            background-color: #f8bbd9;
+            background: white;
             border-radius: 10px;
-            animation: fadeIn 1s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .floating-hearts {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .floating-heart {
-            position: absolute;
-            font-size: 20px;
-            color: #e91e63;
-            animation: float 8s linear infinite;
-            opacity: 0;
-        }
-
-        @keyframes float {
-            0% {    
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100px) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        .instructions {
-            background-color: #f5f5f5;
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-        }
-
-        .warning {
-            color: #ff5722;
+        .indicator-value {
+            font-size: 1.8em;
             font-weight: bold;
-            margin-top: 5px;
+            margin: 5px 0;
         }
     </style>
 </head>
 <body>
-    <div class="floating-hearts" id="floatingHearts"></div>
-    
     <div class="container">
-        <h1>Para Araceli 💖</h1>
+        <h1>Simulador de BCR</h1>
+        <p class="subtitle">ya que me dijiste que tu sueño era ser julio velarde :v</p>
         
-        <div class="instructions">
-            <p>¡Atrapa 10 corazones para descubrir un mensaje especial!</p>
-            <p>💖 = +1 punto | 💣 = -1 punto</p>
-            <p class="warning">¡Cuidado con las bombas!</p>
-            <p>Usa el mouse o desliza tu dedo para mover la canasta</p>
+        <div class="time-section">
+            <div class="quarter" id="quarter">Trimestre 1</div>
         </div>
-        
-        <div class="score-container">
-            <div>Corazones: <span id="score">0</span>/10</div>
-            <div>Tiempo: <span id="timer">60</span>s</div>
+
+        <div class="game-area">
+            <div class="controls">
+                <div class="control-group">
+                    <h3>💰 Política Fiscal</h3>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Impuesto sobre la Renta</span>
+                            <span id="tax-value">25%</span>
+                        </div>
+                        <input type="range" min="10" max="50" value="25" class="slider" id="tax-slider">
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Gasto Público</span>
+                            <span id="spending-value">$50B</span>
+                        </div>
+                        <input type="range" min="20" max="100" value="50" class="slider" id="spending-slider">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>🏦 Política Monetaria</h3>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Tasa de Interés</span>
+                            <span id="rate-value">4.0%</span>
+                        </div>
+                        <input type="range" min="0.5" max="10" step="0.1" value="4.0" class="slider" id="rate-slider">
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Reserva Bancaria</span>
+                            <span id="reserve-value">10%</span>
+                        </div>
+                        <input type="range" min="5" max="20" value="10" class="slider" id="reserve-slider">
+                    </div>
+                </div>
+            </div>
+
+            <div class="results">
+                <h3>📊 Indicadores Económicos</h3>
+                <div class="indicators">
+                    <div class="indicator">
+                        <div>Inflación</div>
+                        <div class="indicator-value" id="inflation">2.1%</div>
+                        <div id="inflation-trend">↗️</div>
+                    </div>
+                    <div class="indicator">
+                        <div>Desempleo</div>
+                        <div class="indicator-value" id="unemployment">5.2%</div>
+                        <div id="unemployment-trend">↘️</div>
+                    </div>
+                    <div class="indicator">
+                        <div>Crecimiento PIB</div>
+                        <div class="indicator-value" id="gdp-growth">3.1%</div>
+                        <div id="gdp-trend">↗️</div>
+                    </div>
+                </div>
+
+                <div class="kpi">
+                    <h4>📈 Bolsa de Valores</h4>
+                    <div class="kpi-value" id="stock-market">4,250 pts</div>
+                </div>
+                <div class="kpi">
+                    <h4>💸 Déficit Fiscal</h4>
+                    <div class="kpi-value" id="deficit">-$15B</div>
+                </div>
+                <div class="kpi">
+                    <h4>🏠 Precio Vivienda</h4>
+                    <div class="kpi-value" id="housing">+2.3%</div>
+                </div>
+
+                <div id="alert" class="alert" style="display: none;">
+                    ¡Cuidado! La economía muestra señales de inestabilidad
+                </div>
+            </div>
         </div>
-        
-        <div class="game-container" id="gameContainer">
-            <div id="basket"></div>
-        </div>
-        
-        <button id="startBtn">Comenzar Juego</button>
-        <button id="hintBtn" style="display: none;">Pista</button>
-        
-        <div id="message">
-            <h2>¡Felicidades! 🎉</h2>
-            <p>Araceli, hay algo que quería decirte...</p>
-            <p><strong>Me gustas mucho.</strong> 💕</p>
-            <p>Y no es algo reciente, llevas en mis pensamientos desde hace mas de 3 años nunca logre sacarte de mi corazón.</p>
-            <p>bueno, solo queria declararme de forma correcta.</p>
-            <p>asi que mejor aprovecho que soy programador.</p>
-        </div>
+
+        <button class="next-btn" onclick="nextQuarter()">Siguiente Trimestre →</button>
     </div>
 
     <script>
-        // Elementos del DOM
-        const gameContainer = document.getElementById('gameContainer');
-        const basket = document.getElementById('basket');
-        const scoreElement = document.getElementById('score');
-        const timerElement = document.getElementById('timer');
-        const startBtn = document.getElementById('startBtn');
-        const hintBtn = document.getElementById('hintBtn');
-        const message = document.getElementById('message');
-        const floatingHeartsContainer = document.getElementById('floatingHearts');
+        let currentQuarter = 1;
+        let economy = {
+            inflation: 2.1,
+            unemployment: 5.2,
+            gdpGrowth: 3.1,
+            stockMarket: 4250,
+            deficit: -15,
+            housing: 2.3
+        };
 
-        // Variables del juego
-        let score = 0;
-        let timeLeft = 60;
-        let gameInterval;
-        let timerInterval;
-        let isGameActive = false;
-        let fallingItems = [];
+        const sliders = ['tax-slider', 'spending-slider', 'rate-slider', 'reserve-slider'];
+        const values = ['tax-value', 'spending-value', 'rate-value', 'reserve-value'];
 
-        // Crear corazones flotantes de fondo
-        function createFloatingHearts() {
-            for (let i = 0; i < 8; i++) {
-                setTimeout(() => {
-                    const heart = document.createElement('div');
-                    heart.className = 'floating-heart';
-                    heart.innerHTML = '💖';
-                    heart.style.left = Math.random() * 100 + 'vw';
-                    heart.style.animationDelay = Math.random() * 5 + 's';
-                    floatingHeartsContainer.appendChild(heart);
-                }, i * 500);
-            }
-        }
-
-        // Inicializar corazones flotantes
-        createFloatingHearts();
-
-        // Mover la canasta con el mouse
-        gameContainer.addEventListener('mousemove', (e) => {
-            if (!isGameActive) return;
+        // Inicializar sliders
+        sliders.forEach((sliderId, index) => {
+            const slider = document.getElementById(sliderId);
+            const value = document.getElementById(values[index]);
             
-            const containerRect = gameContainer.getBoundingClientRect();
-            let x = e.clientX - containerRect.left - (basket.offsetWidth / 2);
-            
-            // Mantener la canasta dentro del contenedor
-            if (x < 0) x = 0;
-            if (x > containerRect.width - basket.offsetWidth) {
-                x = containerRect.width - basket.offsetWidth;
-            }
-            
-            basket.style.left = x + 'px';
-        });
-
-        // Mover la canasta en dispositivos táctiles
-        gameContainer.addEventListener('touchmove', (e) => {
-            if (!isGameActive) return;
-            
-            const containerRect = gameContainer.getBoundingClientRect();
-            let x = e.touches[0].clientX - containerRect.left - (basket.offsetWidth / 2);
-            
-            // Mantener la canasta dentro del contenedor
-            if (x < 0) x = 0;
-            if (x > containerRect.width - basket.offsetWidth) {
-                x = containerRect.width - basket.offsetWidth;
-            }
-            
-            basket.style.left = x + 'px';
-            e.preventDefault();
-        });
-
-        // Crear un nuevo elemento que cae (corazón o bomba)
-        function createFallingItem() {
-            const isHeart = Math.random() > 0.3; // 70% corazones, 30% bombas
-            const item = document.createElement('div');
-            item.className = isHeart ? 'heart' : 'bomb';
-            item.innerHTML = isHeart ? '💖' : '💣';
-            
-            // Posición aleatoria en la parte superior
-            const x = Math.random() * (gameContainer.offsetWidth - 30);
-            item.style.left = x + 'px';
-            item.style.top = '-30px';
-            
-            gameContainer.appendChild(item);
-            fallingItems.push({
-                element: item,
-                x: x,
-                y: -30,
-                speed: 15 + Math.random() * 10, // VELOCIDAD QUINTUPLICADA (15-25 píxeles por frame)
-                isHeart: isHeart
+            slider.addEventListener('input', function() {
+                updateSliderValue(sliderId, value);
+                simulateEconomy();
             });
-        }
+        });
 
-        // Actualizar posición de los elementos que caen
-        function updateFallingItems() {
-            const basketRect = basket.getBoundingClientRect();
-            const containerRect = gameContainer.getBoundingClientRect();
+        function updateSliderValue(sliderId, valueElement) {
+            const slider = document.getElementById(sliderId);
+            let value = slider.value;
             
-            for (let i = fallingItems.length - 1; i >= 0; i--) {
-                const item = fallingItems[i];
-                item.y += item.speed;
-                item.element.style.top = item.y + 'px';
-                
-                // Detectar colisión con la canasta
-                if (
-                    item.y + 24 > basketRect.top - containerRect.top &&
-                    item.y < basketRect.top - containerRect.top + basketRect.height &&
-                    item.x + 24 > basketRect.left - containerRect.left &&
-                    item.x < basketRect.left - containerRect.left + basketRect.width
-                ) {
-                    // Elemento atrapado
-                    if (item.isHeart) {
-                        increaseScore();
-                    } else {
-                        decreaseScore();
-                    }
-                    item.element.remove();
-                    fallingItems.splice(i, 1);
-                    continue;
-                }
-                
-                // Si el elemento sale de la pantalla
-                if (item.y > gameContainer.offsetHeight) {
-                    item.element.remove();
-                    fallingItems.splice(i, 1);
-                }
+            switch(sliderId) {
+                case 'tax-slider':
+                    valueElement.textContent = value + '%';
+                    break;
+                case 'spending-slider':
+                    valueElement.textContent = '$' + value + 'B';
+                    break;
+                case 'rate-slider':
+                    valueElement.textContent = value + '%';
+                    break;
+                case 'reserve-slider':
+                    valueElement.textContent = value + '%';
+                    break;
             }
         }
 
-        // Aumentar puntuación (corazón)
-        function increaseScore() {
-            score++;
-            scoreElement.textContent = score;
+        function simulateEconomy() {
+            const tax = parseInt(document.getElementById('tax-slider').value);
+            const spending = parseInt(document.getElementById('spending-slider').value);
+            const rate = parseFloat(document.getElementById('rate-slider').value);
+            const reserve = parseInt(document.getElementById('reserve-slider').value);
+
+            // Lógica económica compleja
+            const newInflation = calculateInflation(tax, spending, rate);
+            const newUnemployment = calculateUnemployment(tax, spending, rate);
+            const newGDP = calculateGDP(tax, spending, rate);
+            const newStocks = calculateStocks(tax, spending, rate);
+            const newDeficit = calculateDeficit(tax, spending);
+            const newHousing = calculateHousing(rate, newInflation); // CORREGIDO: usar newInflation
+
+            updateIndicators(newInflation, newUnemployment, newGDP, newStocks, newDeficit, newHousing);
+            checkAlerts(newInflation, newUnemployment, newGDP);
+        }
+
+        function calculateInflation(tax, spending, rate) {
+            // Más gasto → más inflación, tasas altas → menos inflación
+            return 2.0 + (spending / 100) - (rate / 10) + (Math.random() - 0.5);
+        }
+
+        function calculateUnemployment(tax, spending, rate) {
+            // Tasas altas → más desempleo, gasto público → menos desempleo
+            return 5.0 + (rate / 4) - (spending / 50) + (Math.random() - 0.3);
+        }
+
+        function calculateGDP(tax, spending, rate) {
+            // Impuestos altos → menos crecimiento, gasto → más crecimiento
+            return 3.0 - (tax / 50) + (spending / 40) - (rate / 8) + (Math.random() - 0.4);
+        }
+
+        function calculateStocks(tax, spending, rate) {
+            const base = 4250;
+            return base + (spending * 10) - (tax * 20) - (rate * 50) + (Math.random() * 100 - 50);
+        }
+
+        function calculateDeficit(tax, spending) {
+            return -spending + (tax * 2) + (Math.random() * 10 - 5);
+        }
+
+        function calculateHousing(rate, inflation) { // CORREGIDO: parámetro inflation
+            return 2.0 - (rate / 2) + (inflation / 2) + (Math.random() - 0.5);
+        }
+
+        function updateIndicators(inflation, unemployment, gdp, stocks, deficit, housing) {
+            document.getElementById('inflation').textContent = inflation.toFixed(1) + '%';
+            document.getElementById('unemployment').textContent = unemployment.toFixed(1) + '%';
+            document.getElementById('gdp-growth').textContent = gdp.toFixed(1) + '%';
+            document.getElementById('stock-market').textContent = Math.round(stocks) + ' pts';
+            document.getElementById('deficit').textContent = (deficit > 0 ? '+$' : '-$') + Math.abs(deficit).toFixed(0) + 'B';
+            document.getElementById('housing').textContent = (housing > 0 ? '+' : '') + housing.toFixed(1) + '%';
+
+            // Actualizar tendencias
+            updateTrend('inflation-trend', inflation, economy.inflation);
+            updateTrend('unemployment-trend', unemployment, economy.unemployment);
+            updateTrend('gdp-trend', gdp, economy.gdpGrowth);
+
+            // Guardar estado actual
+            economy = { inflation, unemployment, gdpGrowth: gdp, stockMarket: stocks, deficit, housing };
+        }
+
+        function updateTrend(elementId, newValue, oldValue) {
+            const trendElement = document.getElementById(elementId);
+            if (newValue > oldValue) {
+                trendElement.textContent = '↗️';
+                trendElement.style.color = '#e74c3c';
+            } else if (newValue < oldValue) {
+                trendElement.textContent = '↘️';
+                trendElement.style.color = '#27ae60';
+            } else {
+                trendElement.textContent = '➡️';
+                trendElement.style.color = '#f39c12';
+            }
+        }
+
+        function checkAlerts(inflation, unemployment, gdp) {
+            const alertElement = document.getElementById('alert');
+            if (inflation > 5 || unemployment > 8 || gdp < 0) {
+                alertElement.style.display = 'block';
+                alertElement.style.background = '#f8d7da';
+                alertElement.style.color = '#721c24';
+                alertElement.textContent = '⚠️ ¡Cuidado! La economía muestra señales de inestabilidad';
+            } else if (inflation < 1 || unemployment < 3) {
+                alertElement.style.display = 'block';
+                alertElement.style.background = '#d1ecf1';
+                alertElement.style.color = '#0c5460';
+                alertElement.textContent = 'ℹ️ La economía podría estar sobrecalentándose';
+            } else {
+                alertElement.style.display = 'none';
+            }
+        }
+
+        function nextQuarter() {
+            currentQuarter++;
+            document.getElementById('quarter').textContent = `Trimestre ${currentQuarter}`;
             
-            // Efecto visual positivo
-            basket.style.backgroundColor = '#4CAF50';
+            // Añadir efectos acumulativos
+            simulateEconomy();
+            
+            // Efecto visual
+            document.querySelector('.next-btn').style.transform = 'scale(0.95)';
             setTimeout(() => {
-                basket.style.backgroundColor = '#e91e63';
-            }, 200);
-            
-            // Comprobar si el jugador ganó
-            if (score >= 10) {
-                winGame();
-            }
+                document.querySelector('.next-btn').style.transform = 'scale(1)';
+            }, 150);
         }
 
-        // Disminuir puntuación (bomba)
-        function decreaseScore() {
-            if (score > 0) {
-                score--;
-                scoreElement.textContent = score;
-            }
-            
-            // Efecto visual negativo
-            basket.style.backgroundColor = '#ff5722';
-            basket.style.transform = 'scale(0.9)';
-            setTimeout(() => {
-                basket.style.backgroundColor = '#e91e63';
-                basket.style.transform = 'scale(1)';
-            }, 200);
-            
-            // Efecto de vibración
-            gameContainer.style.transform = 'translateX(-5px)';
-            setTimeout(() => {
-                gameContainer.style.transform = 'translateX(5px)';
-                setTimeout(() => {
-                    gameContainer.style.transform = 'translateX(0)';
-                }, 50);
-            }, 50);
-        }
-
-        // Actualizar temporizador
-        function updateTimer() {
-            timeLeft--;
-            timerElement.textContent = timeLeft;
-            
-            if (timeLeft <= 0) {
-                endGame();
-            }
-        }
-
-        // Comenzar el juego
-        function startGame() {
-            isGameActive = true;
-            score = 0;
-            timeLeft = 60;
-            scoreElement.textContent = score;
-            timerElement.textContent = timeLeft;
-            
-            // Limpiar elementos existentes
-            fallingItems.forEach(item => item.element.remove());
-            fallingItems = [];
-            
-            // Ocultar mensaje si está visible
-            message.style.display = 'none';
-            
-            // Deshabilitar botón de inicio
-            startBtn.disabled = true;
-            startBtn.textContent = "Juego en curso...";
-            
-            // Mostrar botón de pista
-            hintBtn.style.display = 'inline-block';
-            
-            // Iniciar intervalos
-            gameInterval = setInterval(() => {
-                createFallingItem();
-                updateFallingItems();
-            }, 1000);
-            
-            timerInterval = setInterval(updateTimer, 1000);
-        }
-
-        // Finalizar el juego (derrota)
-        function endGame() {
-            isGameActive = false;
-            clearInterval(gameInterval);
-            clearInterval(timerInterval);
-            
-            // Limpiar elementos
-            fallingItems.forEach(item => item.element.remove());
-            fallingItems = [];
-            
-            // Habilitar botón de inicio
-            startBtn.disabled = false;
-            startBtn.textContent = "Reintentar";
-            
-            alert("¡Se acabó el tiempo! No te rindas, intenta de nuevo. 💖");
-        }
-
-        // Ganar el juego
-        function winGame() {
-            isGameActive = false;
-            clearInterval(gameInterval);
-            clearInterval(timerInterval);
-            
-            // Limpiar elementos
-            fallingItems.forEach(item => item.element.remove());
-            fallingItems = [];
-            
-            // Mostrar mensaje
-            message.style.display = 'block';
-            
-            // Habilitar botón de inicio
-            startBtn.disabled = false;
-            startBtn.textContent = "Jugar de nuevo";
-            
-            // Crear efecto de corazones
-            createCelebrationHearts();
-        }
-
-        // Crear corazones de celebración
-        function createCelebrationHearts() {
-            for (let i = 0; i < 20; i++) {
-                setTimeout(() => {
-                    const heart = document.createElement('div');
-                    heart.className = 'floating-heart';
-                    heart.innerHTML = '💖';
-                    heart.style.left = Math.random() * 100 + 'vw';
-                    heart.style.animationDelay = '0s';
-                    heart.style.animationDuration = (3 + Math.random() * 3) + 's';
-                    floatingHeartsContainer.appendChild(heart);
-                    
-                    // Eliminar después de la animación
-                    setTimeout(() => {
-                        heart.remove();
-                    }, 6000);
-                }, i * 150);
-            }
-        }
-
-        // Dar pista al jugador
-        function giveHint() {
-            if (!isGameActive) return;
-            
-            // Destacar la canasta
-            basket.style.boxShadow = '0 0 20px #ffeb3b';
-            setTimeout(() => {
-                basket.style.boxShadow = 'none';
-            }, 1000);
-            
-            // Mostrar mensaje de ayuda
-            alert("¡Enfócate en los corazones rojos 💖 y evita las bombas negras 💣! Los corazones dan puntos, las bombas los quitan.");
-        }
-
-        // Event listeners
-        startBtn.addEventListener('click', startGame);
-        hintBtn.addEventListener('click', giveHint);
-
-        // Inicialización
-        basket.style.left = (gameContainer.offsetWidth / 2 - basket.offsetWidth / 2) + 'px';
+        // Inicializar
+        simulateEconomy();
     </script>
 </body>
 </html>
