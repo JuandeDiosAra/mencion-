@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+//que haces aqui ? :v
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Macroeconómico - Banco Central</title>
+    <title>🏦 Simulador Macroeconómico - Modo Estrategia</title>
     <style>
         * {
             margin: 0;
@@ -13,37 +14,89 @@
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #1a2a6c, #2c3e50);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             padding: 20px;
+            color: white;
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.95);
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
-            width: 100%;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
         }
 
         h1 {
-            color: #2c3e50;
-            text-align: center;
+            font-size: 2.5em;
             margin-bottom: 10px;
-            font-size: 2.2em;
+            background: linear-gradient(45deg, #3498db, #2ecc71);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .subtitle {
-            text-align: center;
-            color: #7f8c8d;
+        /* Sistema de Puntuación y Objetivos */
+        .game-header {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 20px;
+            align-items: center;
             margin-bottom: 30px;
-            font-size: 1.1em;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 15px;
         }
 
+        .score-section {
+            text-align: center;
+        }
+
+        .score-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #f39c12;
+        }
+
+        .objectives-section {
+            background: rgba(52, 152, 219, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        .objective-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        .objective-progress {
+            width: 100px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #2ecc71;
+            transition: width 0.3s ease;
+        }
+
+        /* Layout Principal */
         .game-area {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -52,148 +105,242 @@
         }
 
         .controls {
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.05);
             padding: 25px;
             border-radius: 15px;
-            border: 2px solid #e9ecef;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .control-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .control-group h3 {
-            color: #2c3e50;
+            color: #3498db;
             margin-bottom: 15px;
-            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .slider-container {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
         }
 
         .slider-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: #495057;
+            font-weight: 600;
+            color: #ecf0f1;
+        }
+
+        .slider-value {
+            font-weight: bold;
+            color: #f39c12;
         }
 
         .slider {
             width: 100%;
             height: 8px;
             border-radius: 4px;
-            background: #dee2e6;
+            background: rgba(255, 255, 255, 0.2);
             outline: none;
-            opacity: 0.7;
-            transition: opacity 0.2s;
         }
 
-        .slider:hover {
-            opacity: 1;
+        .impact-preview {
+            font-size: 0.9em;
+            color: #bdc3c7;
+            margin-top: 5px;
+            min-height: 20px;
         }
 
+        /* Resultados y Gráficos */
         .results {
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.05);
             padding: 25px;
             border-radius: 15px;
-            border: 2px solid #e9ecef;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .kpi {
-            background: white;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 10px;
-            border-left: 5px solid #3498db;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .kpi h4 {
-            color: #2c3e50;
-            margin-bottom: 5px;
-            font-size: 1em;
-        }
-
-        .kpi-value {
-            font-size: 1.4em;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .positive { color: #27ae60; }
-        .negative { color: #e74c3c; }
-        .neutral { color: #f39c12; }
-
-        .alert {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-            text-align: center;
-            color: #856404;
-        }
-
-        .time-section {
-            text-align: center;
+        .indicators-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
             margin-bottom: 20px;
         }
 
-        .quarter {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-
-        .next-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: transform 0.2s;
-            display: block;
-            margin: 20px auto 0;
-        }
-
-        .next-btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .indicators {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .indicator {
-            text-align: center;
-            padding: 15px;
-            background: white;
+        .indicator-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .indicator-value {
-            font-size: 1.8em;
+            font-size: 2em;
             font-weight: bold;
-            margin: 5px 0;
+            margin: 10px 0;
+        }
+
+        .trend-indicator {
+            font-size: 1.2em;
+        }
+
+        /* Gráficos Históricos */
+        .charts-section {
+            margin-top: 25px;
+        }
+
+        .chart-container {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .chart {
+            display: flex;
+            align-items: end;
+            height: 120px;
+            gap: 3px;
+            margin-top: 10px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: #3498db;
+            border-radius: 3px 3px 0 0;
+            min-height: 2px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .chart-bar:hover {
+            opacity: 0.8;
+        }
+
+        /* Sistema de Eventos */
+        .events-section {
+            background: rgba(243, 156, 18, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #f39c12;
+        }
+
+        .event-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Botones y Controles */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Estados y Colores */
+        .positive { color: #2ecc71; }
+        .negative { color: #e74c3c; }
+        .warning { color: #f39c12; }
+
+        .trend-up { color: #2ecc71; }
+        .trend-down { color: #e74c3c; }
+        .trend-neutral { color: #f39c12; }
+
+        .completed {
+            background: rgba(46, 204, 113, 0.2) !important;
+            border-left: 4px solid #2ecc71 !important;
+        }
+
+        .failed {
+            background: rgba(231, 76, 60, 0.2) !important;
+            border-left: 4px solid #e74c3c !important;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Simulador de BCR</h1>
-        <p class="subtitle">ya que me dijiste que tu sueño era ser julio velarde :v</p>
-        
-        <div class="time-section">
-            <div class="quarter" id="quarter">Trimestre 1</div>
+        <div class="header">
+            <h1>🏦 Simulador Macroeconómico - Modo Estrategia</h1>
+            <p>Gestiona la economía y cumple objetivos trimestrales</p>
+        </div>
+
+        <!-- Sistema de Puntuación y Objetivos -->
+        <div class="game-header">
+            <div class="time-section">
+                <div class="quarter" id="quarter">Año 1 - Trimestre 1</div>
+                <div id="economic-cycle">Fase: Expansión</div>
+            </div>
+            
+            <div class="score-section">
+                <div>Puntuación</div>
+                <div class="score-value" id="score">1,000</div>
+                <div id="performance">Desempeño: Estable</div>
+            </div>
+
+            <div class="objectives-section">
+                <h3>🎯 Objetivos del Trimestre</h3>
+                <div class="objective-item">
+                    <span>Inflación: 2-4%</span>
+                    <div class="objective-progress">
+                        <div class="progress-fill" id="inflation-progress" style="width: 50%;"></div>
+                    </div>
+                </div>
+                <div class="objective-item">
+                    <span>Desempleo: < 6%</span>
+                    <div class="objective-progress">
+                        <div class="progress-fill" id="unemployment-progress" style="width: 70%;"></div>
+                    </div>
+                </div>
+                <div class="objective-item">
+                    <span>Crecimiento: > 2%</span>
+                    <div class="objective-progress">
+                        <div class="progress-fill" id="growth-progress" style="width: 80%;"></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="game-area">
@@ -201,237 +348,590 @@
                 <div class="control-group">
                     <h3>💰 Política Fiscal</h3>
                     <div class="slider-container">
-                        <div class="slider-label">
-                            <span>Impuesto sobre la Renta</span>
-                            <span id="tax-value">25%</span>
+                        <div class="slider-header">
+                            <span class="slider-label">Impuesto sobre la Renta</span>
+                            <span class="slider-value" id="tax-value">25%</span>
                         </div>
                         <input type="range" min="10" max="50" value="25" class="slider" id="tax-slider">
+                        <div class="impact-preview" id="tax-impact">Efecto: Neutral en crecimiento, reduce desigualdad</div>
                     </div>
+                    
                     <div class="slider-container">
-                        <div class="slider-label">
-                            <span>Gasto Público</span>
-                            <span id="spending-value">$50B</span>
+                        <div class="slider-header">
+                            <span class="slider-label">Gasto Público</span>
+                            <span class="slider-value" id="spending-value">$50B</span>
                         </div>
                         <input type="range" min="20" max="100" value="50" class="slider" id="spending-slider">
+                        <div class="impact-preview" id="spending-impact">Efecto: Estimula crecimiento, puede aumentar inflación</div>
                     </div>
                 </div>
 
                 <div class="control-group">
                     <h3>🏦 Política Monetaria</h3>
                     <div class="slider-container">
-                        <div class="slider-label">
-                            <span>Tasa de Interés</span>
-                            <span id="rate-value">4.0%</span>
+                        <div class="slider-header">
+                            <span class="slider-label">Tasa de Interés</span>
+                            <span class="slider-value" id="rate-value">4.0%</span>
                         </div>
                         <input type="range" min="0.5" max="10" step="0.1" value="4.0" class="slider" id="rate-slider">
+                        <div class="impact-preview" id="rate-impact">Efecto: Controla inflación, puede frenar inversión</div>
                     </div>
-                    <div class="slider-container">
-                        <div class="slider-label">
-                            <span>Reserva Bancaria</span>
-                            <span id="reserve-value">10%</span>
-                        </div>
-                        <input type="range" min="5" max="20" value="10" class="slider" id="reserve-slider">
-                    </div>
+                </div>
+
+                <div class="events-section" id="events-panel">
+                    <h3>📢 Eventos y Noticias</h3>
+                    <div class="event-item">Bienvenido! Comienza a tomar decisiones de política económica.</div>
                 </div>
             </div>
 
             <div class="results">
-                <h3>📊 Indicadores Económicos</h3>
-                <div class="indicators">
-                    <div class="indicator">
-                        <div>Inflación</div>
+                <h3>📊 Indicadores en Tiempo Real</h3>
+                
+                <div class="indicators-grid">
+                    <div class="indicator-card">
+                        <div>Inflación Anual</div>
                         <div class="indicator-value" id="inflation">2.1%</div>
-                        <div id="inflation-trend">↗️</div>
+                        <div class="trend-indicator" id="inflation-trend">↗️ +0.1%</div>
+                        <div style="font-size: 0.9em; color: #bdc3c7;">Meta: 2-4%</div>
                     </div>
-                    <div class="indicator">
-                        <div>Desempleo</div>
+                    <div class="indicator-card">
+                        <div>Tasa de Desempleo</div>
                         <div class="indicator-value" id="unemployment">5.2%</div>
-                        <div id="unemployment-trend">↘️</div>
+                        <div class="trend-indicator" id="unemployment-trend">↘️ -0.2%</div>
+                        <div style="font-size: 0.9em; color: #bdc3c7;">Meta: < 6%</div>
                     </div>
-                    <div class="indicator">
-                        <div>Crecimiento PIB</div>
+                    <div class="indicator-card">
+                        <div>Crecimiento del PIB</div>
                         <div class="indicator-value" id="gdp-growth">3.1%</div>
-                        <div id="gdp-trend">↗️</div>
+                        <div class="trend-indicator" id="gdp-trend">↗️ +0.3%</div>
+                        <div style="font-size: 0.9em; color: #bdc3c7;">Meta: > 2%</div>
+                    </div>
+                    <div class="indicator-card">
+                        <div>Confianza del Consumidor</div>
+                        <div class="indicator-value" id="confidence">72.5</div>
+                        <div class="trend-indicator" id="confidence-trend">↗️ +2.1</div>
+                        <div style="font-size: 0.9em; color: #bdc3c7;">Escala: 0-100</div>
                     </div>
                 </div>
 
-                <div class="kpi">
-                    <h4>📈 Bolsa de Valores</h4>
-                    <div class="kpi-value" id="stock-market">4,250 pts</div>
-                </div>
-                <div class="kpi">
-                    <h4>💸 Déficit Fiscal</h4>
-                    <div class="kpi-value" id="deficit">-$15B</div>
-                </div>
-                <div class="kpi">
-                    <h4>🏠 Precio Vivienda</h4>
-                    <div class="kpi-value" id="housing">+2.3%</div>
-                </div>
-
-                <div id="alert" class="alert" style="display: none;">
-                    ¡Cuidado! La economía muestra señales de inestabilidad
+                <div class="charts-section">
+                    <h3>📈 Evolución Histórica</h3>
+                    <div class="chart-container">
+                        <div>Crecimiento del PIB (Últimos 8 trimestres)</div>
+                        <div class="chart" id="gdp-chart">
+                            <!-- Barras del gráfico generadas por JavaScript -->
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <div>Inflación (Últimos 8 trimestres)</div>
+                        <div class="chart" id="inflation-chart">
+                            <!-- Barras del gráfico generadas por JavaScript -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <button class="next-btn" onclick="nextQuarter()">Siguiente Trimestre →</button>
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="showStats()">📊 Ver Estadísticas</button>
+            <button class="btn btn-primary" onclick="nextQuarter()">⏭️ Avanzar al Siguiente Trimestre</button>
+            <button class="btn btn-secondary" onclick="resetGame()">🔄 Reiniciar Juego</button>
+        </div>
     </div>
 
     <script>
-        let currentQuarter = 1;
-        let economy = {
-            inflation: 2.1,
-            unemployment: 5.2,
-            gdpGrowth: 3.1,
-            stockMarket: 4250,
-            deficit: -15,
-            housing: 2.3
-        };
+        // ===== SISTEMA DE JUEGO MEJORADO =====
+        class EconomicGame {
+            constructor() {
+                this.quarter = 1;
+                this.year = 1;
+                this.score = 1000;
+                this.performance = 'Estable';
+                this.economicCycle = 'Expansión';
+                
+                // Estado económico con momentum
+                this.economy = {
+                    inflation: 2.1,
+                    unemployment: 5.2,
+                    gdpGrowth: 3.1,
+                    consumerConfidence: 72.5,
+                    lastQuarterGDP: 3.0,
+                    inflationExpectations: 2.1
+                };
 
-        const sliders = ['tax-slider', 'spending-slider', 'rate-slider', 'reserve-slider'];
-        const values = ['tax-value', 'spending-value', 'rate-value', 'reserve-value'];
+                // Políticas actuales
+                this.policies = {
+                    tax: 25,
+                    spending: 50,
+                    interestRate: 4.0
+                };
 
-        // Inicializar sliders
-        sliders.forEach((sliderId, index) => {
-            const slider = document.getElementById(sliderId);
-            const value = document.getElementById(values[index]);
+                // Historial para gráficos
+                this.history = {
+                    gdp: [2.8, 2.9, 3.0, 3.1],
+                    inflation: [1.9, 2.0, 2.0, 2.1],
+                    unemployment: [5.5, 5.4, 5.3, 5.2]
+                };
+
+                // Sistema de objetivos
+                this.objectives = {
+                    inflation: { target: [2, 4], current: 0, completed: false },
+                    unemployment: { target: [0, 6], current: 0, completed: false },
+                    growth: { target: [2, 10], current: 0, completed: false }
+                };
+
+                // Eventos y noticias
+                this.events = [];
+                this.quarterEvents = [];
+            }
+
+            // Modelo económico mejorado con trade-offs
+            simulateQuarter() {
+                const previousState = {...this.economy};
+                
+                // 1. Calcular nuevos indicadores con efectos no lineales
+                this.economy.inflation = this.calculateInflation(previousState);
+                this.economy.unemployment = this.calculateUnemployment(previousState);
+                this.economy.gdpGrowth = this.calculateGDP(previousState);
+                this.economy.consumerConfidence = this.calculateConfidence(previousState);
+                
+                // 2. Actualizar expectativas (efecto momentum)
+                this.economy.inflationExpectations = 
+                    (this.economy.inflationExpectations * 0.7) + (this.economy.inflation * 0.3);
+                
+                // 3. Actualizar historial
+                this.updateHistory();
+                
+                // 4. Generar eventos aleatorios
+                this.generateEvents();
+                
+                // 5. Calcular puntuación y objetivos
+                this.calculateScore();
+                this.updateObjectives();
+                
+                // 6. Actualizar ciclo económico
+                this.updateEconomicCycle();
+            }
+
+            calculateInflation(previous) {
+                const { tax, spending, interestRate } = this.policies;
+                
+                let inflation = previous.inflationExpectations;
+                
+                // Efectos de políticas (no lineales)
+                inflation += (spending - 50) * 0.025; // Gasto público
+                inflation -= (interestRate - 4) * 0.2; // Tasas de interés
+                inflation += (tax > 35 ? 0.3 : 0); // Impuestos muy altos
+                
+                // Efecto de confianza del consumidor
+                inflation += (this.economy.consumerConfidence - 70) * 0.01;
+                
+                // Ruido aleatorio y shocks
+                inflation += (Math.random() - 0.5) * 0.4;
+                
+                return Math.max(0.1, Math.min(15, inflation));
+            }
+
+            calculateUnemployment(previous) {
+                const { tax, spending, interestRate } = this.policies;
+                
+                let unemployment = previous.unemployment;
+                
+                // Efectos de políticas con rendimientos decrecientes
+                unemployment += Math.max(0, (tax - 25) * 0.08);
+                unemployment -= Math.min(2, (spending - 40) * 0.03);
+                unemployment += (interestRate - 3) * 0.15;
+                
+                // Efecto del crecimiento económico
+                unemployment -= (this.economy.gdpGrowth - 2) * 0.1;
+                
+                // Inercia del mercado laboral
+                unemployment = (unemployment + previous.unemployment * 0.6) / 1.6;
+                
+                return Math.max(1, Math.min(25, unemployment + (Math.random() - 0.5) * 0.3));
+            }
+
+            calculateGDP(previous) {
+                const { tax, spending, interestRate } = this.policies;
+                
+                let gdp = previous.gdpGrowth;
+                
+                // Trade-offs realistas
+                gdp -= Math.pow(tax - 25, 2) * 0.001; // Demasiado alto o bajo es malo
+                gdp += Math.log(spending + 1) * 0.8; // Rendimientos decrecientes
+                gdp -= Math.exp(interestRate / 3) * 0.1; // Efecto exponencial de tasas altas
+                
+                // Efectos secundarios de inflación
+                gdp -= Math.max(0, (this.economy.inflation - 3) * 0.2);
+                
+                // Momentum y confianza
+                gdp += (this.economy.consumerConfidence - 70) * 0.02;
+                
+                return Math.max(-5, Math.min(10, gdp + (Math.random() - 0.5) * 0.5));
+            }
+
+            calculateConfidence(previous) {
+                let confidence = previous.consumerConfidence;
+                
+                // Factores que afectan la confianza
+                confidence += (this.economy.gdpGrowth - 2) * 2;
+                confidence -= (this.economy.inflation - 2) * 3;
+                confidence -= (this.economy.unemployment - 5) * 2;
+                confidence += (this.policies.spending - 40) * 0.1;
+                
+                // Persistencia de la confianza
+                confidence = (confidence + previous.consumerConfidence * 0.8) / 1.8;
+                
+                return Math.max(0, Math.min(100, confidence));
+            }
+
+            updateHistory() {
+                this.history.gdp.push(this.economy.gdpGrowth);
+                this.history.inflation.push(this.economy.inflation);
+                this.history.unemployment.push(this.economy.unemployment);
+                
+                // Mantener solo últimos 8 trimestres
+                if (this.history.gdp.length > 8) {
+                    this.history.gdp.shift();
+                    this.history.inflation.shift();
+                    this.history.unemployment.shift();
+                }
+            }
+
+            generateEvents() {
+                const possibleEvents = [
+                    {
+                        probability: 0.15,
+                        message: "📈 Boom en sector tecnología impulsa el crecimiento",
+                        effect: () => { this.economy.gdpGrowth += 0.8; this.economy.consumerConfidence += 5; }
+                    },
+                    {
+                        probability: 0.12,
+                        message: "🛢️ Suben precios del petróleo - impacto inflacionario",
+                        effect: () => { this.economy.inflation += 1.2; this.economy.gdpGrowth -= 0.5; }
+                    },
+                    {
+                        probability: 0.1,
+                        message: "🌍 Crisis comercial internacional afecta exportaciones",
+                        effect: () => { this.economy.gdpGrowth -= 0.7; this.economy.unemployment += 0.5; }
+                    },
+                    {
+                        probability: 0.08,
+                        message: "💼 Reforma laboral crea nuevos empleos",
+                        effect: () => { this.economy.unemployment -= 0.8; this.economy.consumerConfidence += 3; }
+                    }
+                ];
+
+                this.quarterEvents = [];
+                possibleEvents.forEach(event => {
+                    if (Math.random() < event.probability) {
+                        event.effect();
+                        this.quarterEvents.push(event.message);
+                        this.events.push({
+                            quarter: this.quarter,
+                            year: this.year,
+                            message: event.message
+                        });
+                    }
+                });
+            }
+
+            calculateScore() {
+                let baseScore = 1000;
+                let quarterBonus = 0;
+                
+                // Bonificaciones por cumplir objetivos
+                if (this.objectives.inflation.completed) quarterBonus += 100;
+                if (this.objectives.unemployment.completed) quarterBonus += 150;
+                if (this.objectives.growth.completed) quarterBonus += 120;
+                
+                // Penalizaciones por desviaciones extremas
+                if (this.economy.inflation > 8) quarterBonus -= 200;
+                if (this.economy.unemployment > 10) quarterBonus -= 250;
+                if (this.economy.gdpGrowth < -2) quarterBonus -= 300;
+                
+                // Bonificación por estabilidad
+                const stability = 100 - (
+                    Math.abs(this.economy.inflation - 3) * 10 +
+                    Math.abs(this.economy.unemployment - 5) * 8 +
+                    Math.abs(this.economy.gdpGrowth - 3) * 6
+                );
+                quarterBonus += Math.max(0, stability);
+                
+                this.score = Math.max(0, baseScore + quarterBonus);
+                
+                // Actualizar desempeño
+                if (quarterBonus >= 200) this.performance = "Excelente";
+                else if (quarterBonus >= 100) this.performance = "Bueno";
+                else if (quarterBonus >= 0) this.performance = "Estable";
+                else this.performance = "Preocupante";
+            }
+
+            updateObjectives() {
+                // Inflación objetivo: 2-4%
+                const inflationProgress = Math.max(0, 100 - Math.abs(this.economy.inflation - 3) * 50);
+                this.objectives.inflation.current = Math.min(100, inflationProgress);
+                this.objectives.inflation.completed = this.economy.inflation >= 2 && this.economy.inflation <= 4;
+                
+                // Desempleo objetivo: <6%
+                const unemploymentProgress = Math.max(0, 100 - (this.economy.unemployment * 16.67));
+                this.objectives.unemployment.current = Math.min(100, unemploymentProgress);
+                this.objectives.unemployment.completed = this.economy.unemployment < 6;
+                
+                // Crecimiento objetivo: >2%
+                const growthProgress = Math.max(0, (this.economy.gdpGrowth - 1) * 50);
+                this.objectives.growth.current = Math.min(100, growthProgress);
+                this.objectives.growth.completed = this.economy.gdpGrowth > 2;
+            }
+
+            updateEconomicCycle() {
+                const { gdpGrowth, inflation, unemployment } = this.economy;
+                
+                if (gdpGrowth > 5 && inflation < 3) {
+                    this.economicCycle = "Boom Económico 🚀";
+                } else if (gdpGrowth > 2 && inflation < 4) {
+                    this.economicCycle = "Expansión 📈";
+                } else if (gdpGrowth < 0) {
+                    this.economicCycle = "Recesión 📉";
+                } else if (inflation > 6 && gdpGrowth < 2) {
+                    this.economicCycle = "Estanflación ⚠️";
+                } else {
+                    this.economicCycle = "Estabilidad ⚖️";
+                }
+            }
+        }
+
+        // ===== INICIALIZACIÓN Y CONTROL DE LA UI =====
+        const game = new EconomicGame();
+
+        function initGame() {
+            updateSliders();
+            updateDisplay();
+            renderCharts();
+        }
+
+        function updateSliders() {
+            const sliders = ['tax-slider', 'spending-slider', 'rate-slider'];
             
-            slider.addEventListener('input', function() {
-                updateSliderValue(sliderId, value);
-                simulateEconomy();
+            sliders.forEach(sliderId => {
+                const slider = document.getElementById(sliderId);
+                slider.addEventListener('input', function() {
+                    updateSliderValue(sliderId);
+                    updateImpactPreviews();
+                    simulatePreview();
+                });
             });
-        });
+        }
 
-        function updateSliderValue(sliderId, valueElement) {
+        function updateSliderValue(sliderId) {
             const slider = document.getElementById(sliderId);
-            let value = slider.value;
-            
+            const value = slider.value;
+            let valueElement;
+
             switch(sliderId) {
                 case 'tax-slider':
+                    valueElement = document.getElementById('tax-value');
                     valueElement.textContent = value + '%';
+                    game.policies.tax = parseInt(value);
                     break;
                 case 'spending-slider':
+                    valueElement = document.getElementById('spending-value');
                     valueElement.textContent = '$' + value + 'B';
+                    game.policies.spending = parseInt(value);
                     break;
                 case 'rate-slider':
+                    valueElement = document.getElementById('rate-value');
                     valueElement.textContent = value + '%';
-                    break;
-                case 'reserve-slider':
-                    valueElement.textContent = value + '%';
+                    game.policies.interestRate = parseFloat(value);
                     break;
             }
         }
 
-        function simulateEconomy() {
-            const tax = parseInt(document.getElementById('tax-slider').value);
-            const spending = parseInt(document.getElementById('spending-slider').value);
-            const rate = parseFloat(document.getElementById('rate-slider').value);
-            const reserve = parseInt(document.getElementById('reserve-slider').value);
-
-            // Lógica económica compleja
-            const newInflation = calculateInflation(tax, spending, rate);
-            const newUnemployment = calculateUnemployment(tax, spending, rate);
-            const newGDP = calculateGDP(tax, spending, rate);
-            const newStocks = calculateStocks(tax, spending, rate);
-            const newDeficit = calculateDeficit(tax, spending);
-            const newHousing = calculateHousing(rate, newInflation); // CORREGIDO: usar newInflation
-
-            updateIndicators(newInflation, newUnemployment, newGDP, newStocks, newDeficit, newHousing);
-            checkAlerts(newInflation, newUnemployment, newGDP);
+        function updateImpactPreviews() {
+            const { tax, spending, interestRate } = game.policies;
+            
+            // Actualizar descripciones de impacto en tiempo real
+            document.getElementById('tax-impact').textContent = 
+                tax > 35 ? "Efecto: Alto - Reduce inversión, mejora ingresos fiscales" :
+                tax < 20 ? "Efecto: Bajo - Estimula consumo, aumenta déficit" :
+                "Efecto: Moderado - Balance entre crecimiento y sostenibilidad";
+                
+            document.getElementById('spending-impact').textContent = 
+                spending > 70 ? "Efecto: Alto - Fuerte estímulo, riesgo inflacionario" :
+                spending < 35 ? "Efecto: Bajo - Ahorro fiscal, riesgo de desaceleración" :
+                "Efecto: Moderado - Estímulo controlado";
+                
+            document.getElementById('rate-impact').textContent = 
+                interestRate > 6 ? "Efecto: Alto - Frena inflación, reduce crecimiento" :
+                interestRate < 2.5 ? "Efecto: Bajo - Estimula inversión, riesgo inflacionario" :
+                "Efecto: Neutral - Balance entre crecimiento e inflación";
         }
 
-        function calculateInflation(tax, spending, rate) {
-            // Más gasto → más inflación, tasas altas → menos inflación
-            return 2.0 + (spending / 100) - (rate / 10) + (Math.random() - 0.5);
+        function simulatePreview() {
+            // Simulación rápida para preview (sin guardar estado)
+            const tempGame = Object.assign(Object.create(Object.getPrototypeOf(game)), game);
+            tempGame.simulateQuarter();
+            
+            // Mostrar tendencias estimadas
+            updateTrendIndicators(tempGame.economy);
         }
 
-        function calculateUnemployment(tax, spending, rate) {
-            // Tasas altas → más desempleo, gasto público → menos desempleo
-            return 5.0 + (rate / 4) - (spending / 50) + (Math.random() - 0.3);
-        }
-
-        function calculateGDP(tax, spending, rate) {
-            // Impuestos altos → menos crecimiento, gasto → más crecimiento
-            return 3.0 - (tax / 50) + (spending / 40) - (rate / 8) + (Math.random() - 0.4);
-        }
-
-        function calculateStocks(tax, spending, rate) {
-            const base = 4250;
-            return base + (spending * 10) - (tax * 20) - (rate * 50) + (Math.random() * 100 - 50);
-        }
-
-        function calculateDeficit(tax, spending) {
-            return -spending + (tax * 2) + (Math.random() * 10 - 5);
-        }
-
-        function calculateHousing(rate, inflation) { // CORREGIDO: parámetro inflation
-            return 2.0 - (rate / 2) + (inflation / 2) + (Math.random() - 0.5);
-        }
-
-        function updateIndicators(inflation, unemployment, gdp, stocks, deficit, housing) {
-            document.getElementById('inflation').textContent = inflation.toFixed(1) + '%';
-            document.getElementById('unemployment').textContent = unemployment.toFixed(1) + '%';
-            document.getElementById('gdp-growth').textContent = gdp.toFixed(1) + '%';
-            document.getElementById('stock-market').textContent = Math.round(stocks) + ' pts';
-            document.getElementById('deficit').textContent = (deficit > 0 ? '+$' : '-$') + Math.abs(deficit).toFixed(0) + 'B';
-            document.getElementById('housing').textContent = (housing > 0 ? '+' : '') + housing.toFixed(1) + '%';
-
+        function updateDisplay() {
+            // Información del juego
+            document.getElementById('quarter').textContent = `Año ${game.year} - Trimestre ${game.quarter}`;
+            document.getElementById('economic-cycle').textContent = `Fase: ${game.economicCycle}`;
+            document.getElementById('score').textContent = game.score.toLocaleString();
+            document.getElementById('performance').textContent = `Desempeño: ${game.performance}`;
+            
+            // Indicadores económicos
+            document.getElementById('inflation').textContent = game.economy.inflation.toFixed(1) + '%';
+            document.getElementById('unemployment').textContent = game.economy.unemployment.toFixed(1) + '%';
+            document.getElementById('gdp-growth').textContent = game.economy.gdpGrowth.toFixed(1) + '%';
+            document.getElementById('confidence').textContent = game.economy.consumerConfidence.toFixed(1);
+            
+            // Progreso de objetivos
+            document.getElementById('inflation-progress').style.width = game.objectives.inflation.current + '%';
+            document.getElementById('unemployment-progress').style.width = game.objectives.unemployment.current + '%';
+            document.getElementById('growth-progress').style.width = game.objectives.growth.current + '%';
+            
+            // Actualizar eventos
+            updateEventsDisplay();
+            
             // Actualizar tendencias
-            updateTrend('inflation-trend', inflation, economy.inflation);
-            updateTrend('unemployment-trend', unemployment, economy.unemployment);
-            updateTrend('gdp-trend', gdp, economy.gdpGrowth);
-
-            // Guardar estado actual
-            economy = { inflation, unemployment, gdpGrowth: gdp, stockMarket: stocks, deficit, housing };
+            updateTrendIndicators(game.economy);
         }
 
-        function updateTrend(elementId, newValue, oldValue) {
-            const trendElement = document.getElementById(elementId);
-            if (newValue > oldValue) {
-                trendElement.textContent = '↗️';
-                trendElement.style.color = '#e74c3c';
-            } else if (newValue < oldValue) {
-                trendElement.textContent = '↘️';
-                trendElement.style.color = '#27ae60';
-            } else {
-                trendElement.textContent = '➡️';
-                trendElement.style.color = '#f39c12';
+        function updateTrendIndicators(economy) {
+            // En un juego real, comparar con trimestre anterior
+            // Por simplicidad, usamos valores aleatorios para demo
+            document.getElementById('inflation-trend').textContent = 
+                economy.inflation > 2.5 ? '↗️ +0.2%' : economy.inflation < 1.5 ? '↘️ -0.1%' : '➡️ Estable';
+                
+            document.getElementById('unemployment-trend').textContent = 
+                economy.unemployment > 5.5 ? '↗️ +0.3%' : economy.unemployment < 4.5 ? '↘️ -0.2%' : '➡️ Estable';
+                
+            document.getElementById('gdp-trend').textContent = 
+                economy.gdpGrowth > 3.5 ? '↗️ +0.4%' : economy.gdpGrowth < 2.5 ? '↘️ -0.2%' : '➡️ Estable';
+                
+            document.getElementById('confidence-trend').textContent = 
+                economy.consumerConfidence > 75 ? '↗️ +3.2' : economy.consumerConfidence < 70 ? '↘️ -1.8' : '➡️ Estable';
+        }
+
+        function updateEventsDisplay() {
+            const eventsPanel = document.getElementById('events-panel');
+            const eventsContent = eventsPanel.querySelectorAll('.event-item');
+            
+            // Remover eventos antiguos (mantener solo los 3 más recientes)
+            eventsContent.forEach((event, index) => {
+                if (index > 0) event.remove(); // Mantener el primer elemento (placeholder)
+            });
+            
+            // Añadir nuevos eventos del trimestre
+            game.quarterEvents.forEach(eventMessage => {
+                const eventElement = document.createElement('div');
+                eventElement.className = 'event-item';
+                eventElement.textContent = eventMessage;
+                eventsPanel.appendChild(eventElement);
+            });
+            
+            // Si no hay eventos nuevos, mostrar mensaje por defecto
+            if (game.quarterEvents.length === 0) {
+                const defaultEvent = document.createElement('div');
+                defaultEvent.className = 'event-item';
+                defaultEvent.textContent = 'Mercados estables sin eventos significativos este trimestre.';
+                eventsPanel.appendChild(defaultEvent);
             }
         }
 
-        function checkAlerts(inflation, unemployment, gdp) {
-            const alertElement = document.getElementById('alert');
-            if (inflation > 5 || unemployment > 8 || gdp < 0) {
-                alertElement.style.display = 'block';
-                alertElement.style.background = '#f8d7da';
-                alertElement.style.color = '#721c24';
-                alertElement.textContent = '⚠️ ¡Cuidado! La economía muestra señales de inestabilidad';
-            } else if (inflation < 1 || unemployment < 3) {
-                alertElement.style.display = 'block';
-                alertElement.style.background = '#d1ecf1';
-                alertElement.style.color = '#0c5460';
-                alertElement.textContent = 'ℹ️ La economía podría estar sobrecalentándose';
-            } else {
-                alertElement.style.display = 'none';
-            }
+        function renderCharts() {
+            renderChart('gdp-chart', game.history.gdp, '#2ecc71');
+            renderChart('inflation-chart', game.history.inflation, '#e74c3c');
+        }
+
+        function renderChart(containerId, data, color) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            const maxVal = Math.max(...data, 1);
+            const minVal = Math.min(...data, -2);
+            const range = maxVal - minVal;
+            
+            data.forEach(value => {
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                const height = ((value - minVal) / range) * 100;
+                bar.style.height = height + '%';
+                bar.style.background = value >= 0 ? color : '#e74c3c';
+                bar.title = value.toFixed(1) + '%';
+                container.appendChild(bar);
+            });
         }
 
         function nextQuarter() {
-            currentQuarter++;
-            document.getElementById('quarter').textContent = `Trimestre ${currentQuarter}`;
+            // Aplicar simulación
+            game.simulateQuarter();
             
-            // Añadir efectos acumulativos
-            simulateEconomy();
+            // Actualizar displays
+            updateDisplay();
+            renderCharts();
+            updateImpactPreviews();
             
             // Efecto visual
-            document.querySelector('.next-btn').style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                document.querySelector('.next-btn').style.transform = 'scale(1)';
-            }, 150);
+            const btn = event.target;
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => btn.style.transform = 'scale(1)', 150);
+            
+            // Mostrar resumen del trimestre
+            showQuarterSummary();
         }
 
-        // Inicializar
-        simulateEconomy();
+        function showQuarterSummary() {
+            const completed = Object.values(game.objectives).filter(obj => obj.completed).length;
+            const total = Object.values(game.objectives).length;
+            
+            let message = `Trimestre ${game.quarter} completado!\n`;
+            message += `Objetivos cumplidos: ${completed}/${total}\n`;
+            message += `Puntuación: +${game.score - 1000} puntos\n`;
+            message += `Desempeño: ${game.performance}`;
+            
+            if (completed === total) {
+                message += "\n\n🎉 ¡Excelente trabajo! Todos los objetivos cumplidos.";
+            }
+            
+            alert(message);
+        }
+
+        function showStats() {
+            const stats = `
+📊 ESTADÍSTICAS DEL JUEGO:
+
+Año ${game.year} - Trimestre ${game.quarter}
+Puntuación Total: ${game.score}
+Desempeño: ${game.performance}
+Fase Económica: ${game.economicCycle}
+
+OBJETIVOS:
+✅ Inflación: ${game.economy.inflation.toFixed(1)}% (Meta: 2-4%)
+✅ Desempleo: ${game.economy.unemployment.toFixed(1)}% (Meta: <6%)
+✅ Crecimiento: ${game.economy.gdpGrowth.toFixed(1)}% (Meta: >2%)
+
+PRÓXIMOS RETOS:
+- Mantener la estabilidad económica
+- Prepararse para posibles shocks
+- Mejorar el bienestar social
+            `;
+            alert(stats);
+        }
+
+        function resetGame() {
+            if (confirm('¿Estás seguro de que quieres reiniciar el juego? Se perderá todo el progreso.')) {
+                // Recargar la página para un reset completo
+                location.reload();
+            }
+        }
+
+        // Inicializar el juego cuando se carga la página
+        window.onload = initGame;
     </script>
 </body>
 </html>
