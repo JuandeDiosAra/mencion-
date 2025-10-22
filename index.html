@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Macroeconómico - Banco Central</title>
+    <title>Simulador Macroeconómico Avanzado - Banco Central</title>
     <style>
         * {
             margin: 0;
@@ -26,7 +26,7 @@
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
         }
 
@@ -185,15 +185,38 @@
             font-weight: bold;
             margin: 5px 0;
         }
+
+        .history-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .history-chart {
+            display: flex;
+            align-items: end;
+            height: 100px;
+            gap: 2px;
+            margin-top: 10px;
+        }
+
+        .history-bar {
+            flex: 1;
+            background: #3498db;
+            border-radius: 2px 2px 0 0;
+            min-height: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Simulador macroeconomico chafa :v</h1>
-        <p class="subtitle"></p>
+        <h1>🏦 Simulador Macroeconómico Avanzado</h1>
+        <p class="subtitle">Banco Central - Toma decisiones y observa el impacto en la economía</p>
         
         <div class="time-section">
-            <div class="quarter" id="quarter">Trimestre 1</div>
+            <div class="quarter" id="quarter">Año 1 - Trimestre 1</div>
+            <div id="economic-cycle">Fase: Expansión</div>
         </div>
 
         <div class="game-area">
@@ -233,6 +256,24 @@
                         <input type="range" min="5" max="20" value="10" class="slider" id="reserve-slider">
                     </div>
                 </div>
+
+                <div class="control-group">
+                    <h3>🌍 Factores Externos</h3>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Comercio Internacional</span>
+                            <span id="trade-value">Normal</span>
+                        </div>
+                        <input type="range" min="1" max="5" value="3" class="slider" id="trade-slider">
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Confianza del Consumidor</span>
+                            <span id="confidence-value">Neutral</span>
+                        </div>
+                        <input type="range" min="1" max="5" value="3" class="slider" id="confidence-slider">
+                    </div>
+                </div>
             </div>
 
             <div class="results">
@@ -267,6 +308,15 @@
                     <h4>🏠 Precio Vivienda</h4>
                     <div class="kpi-value" id="housing">+2.3%</div>
                 </div>
+                <div class="kpi">
+                    <h4>💰 Tipo de Cambio</h4>
+                    <div class="kpi-value" id="exchange-rate">1.00 USD</div>
+                </div>
+
+                <div class="history-section">
+                    <h4>📈 Historial del PIB (últimos 8 trimestres)</h4>
+                    <div class="history-chart" id="gdp-history"></div>
+                </div>
 
                 <div id="alert" class="alert" style="display: none;">
                     ¡Cuidado! La economía muestra señales de inestabilidad
@@ -279,17 +329,30 @@
 
     <script>
         let currentQuarter = 1;
+        let currentYear = 1;
+        let economicCycle = 'Expansión';
+        let gdpHistory = [3.1, 3.0, 2.9, 3.2]; // Historial inicial
+        
         let economy = {
             inflation: 2.1,
             unemployment: 5.2,
             gdpGrowth: 3.1,
             stockMarket: 4250,
             deficit: -15,
-            housing: 2.3
+            housing: 2.3,
+            exchangeRate: 1.00,
+            consumerConfidence: 3
         };
 
-        const sliders = ['tax-slider', 'spending-slider', 'rate-slider', 'reserve-slider'];
-        const values = ['tax-value', 'spending-value', 'rate-value', 'reserve-value'];
+        const sliders = [
+            'tax-slider', 'spending-slider', 'rate-slider', 
+            'reserve-slider', 'trade-slider', 'confidence-slider'
+        ];
+        
+        const values = [
+            'tax-value', 'spending-value', 'rate-value', 
+            'reserve-value', 'trade-value', 'confidence-value'
+        ];
 
         // Inicializar sliders
         sliders.forEach((sliderId, index) => {
@@ -319,6 +382,14 @@
                 case 'reserve-slider':
                     valueElement.textContent = value + '%';
                     break;
+                case 'trade-slider':
+                    const tradeLabels = ['Muy Restrictivo', 'Restrictivo', 'Normal', 'Liberal', 'Muy Liberal'];
+                    valueElement.textContent = tradeLabels[value - 1];
+                    break;
+                case 'confidence-slider':
+                    const confidenceLabels = ['Muy Baja', 'Baja', 'Neutral', 'Alta', 'Muy Alta'];
+                    valueElement.textContent = confidenceLabels[value - 1];
+                    break;
             }
         }
 
@@ -327,50 +398,100 @@
             const spending = parseInt(document.getElementById('spending-slider').value);
             const rate = parseFloat(document.getElementById('rate-slider').value);
             const reserve = parseInt(document.getElementById('reserve-slider').value);
+            const trade = parseInt(document.getElementById('trade-slider').value);
+            const confidence = parseInt(document.getElementById('confidence-slider').value);
 
-            const newInflation = calculateInflation(tax, spending, rate);
-            const newUnemployment = calculateUnemployment(tax, spending, rate);
-            const newGDP = calculateGDP(tax, spending, rate);
-            const newStocks = calculateStocks(tax, spending, rate);
-            const newDeficit = calculateDeficit(tax, spending);
-            const newHousing = calculateHousing(rate, newInflation); // CORREGIDO: usar newInflation
+            // Cálculos más realistas con interdependencias
+            const newInflation = calculateInflation(tax, spending, rate, trade, confidence);
+            const newUnemployment = calculateUnemployment(tax, spending, rate, newInflation);
+            const newGDP = calculateGDP(tax, spending, rate, newInflation, confidence, trade);
+            const newStocks = calculateStocks(tax, spending, rate, newGDP, newInflation);
+            const newDeficit = calculateDeficit(tax, spending, newGDP);
+            const newHousing = calculateHousing(rate, newInflation, newGDP);
+            const newExchangeRate = calculateExchangeRate(rate, newInflation, newGDP);
 
-            updateIndicators(newInflation, newUnemployment, newGDP, newStocks, newDeficit, newHousing);
+            updateIndicators(newInflation, newUnemployment, newGDP, newStocks, newDeficit, newHousing, newExchangeRate);
             checkAlerts(newInflation, newUnemployment, newGDP);
+            updateEconomicCycle(newGDP, newInflation);
         }
 
-        function calculateInflation(tax, spending, rate) {
-            return 2.0 + (spending / 100) - (rate / 10) + (Math.random() - 0.5);
+        function calculateInflation(tax, spending, rate, trade, confidence) {
+            let inflation = 2.0;
+            inflation += (spending - 50) * 0.02; // Gasto público afecta inflación
+            inflation -= (rate - 4) * 0.1; // Tasas altas reducen inflación
+            inflation += (tax - 25) * 0.01; // Impuestos muy altos pueden aumentar costos
+            inflation += (trade - 3) * 0.1; // Comercio internacional afecta precios
+            inflation += (confidence - 3) * 0.05; // Confianza afecta demanda
+            inflation += (Math.random() - 0.5) * 0.3; // Ruido aleatorio
+            
+            return Math.max(0.1, Math.min(15, inflation));
         }
 
-        function calculateUnemployment(tax, spending, rate) {
-            return 5.0 + (rate / 4) - (spending / 50) + (Math.random() - 0.3);
+        function calculateUnemployment(tax, spending, rate, inflation) {
+            let unemployment = 5.0;
+            unemployment += (tax - 25) * 0.05; // Impuestos altos afectan empleo
+            unemployment -= (spending - 50) * 0.02; // Gasto público crea empleos
+            unemployment += (rate - 4) * 0.2; // Tasas altas reducen inversión
+            unemployment += (inflation - 2) * 0.1; // Inflación alta afecta empleo
+            
+            return Math.max(1, Math.min(20, unemployment));
         }
 
-        function calculateGDP(tax, spending, rate) {
-            return 3.0 - (tax / 50) + (spending / 40) - (rate / 8) + (Math.random() - 0.4);
+        function calculateGDP(tax, spending, rate, inflation, confidence, trade) {
+            let gdp = 3.0;
+            gdp -= (tax - 25) * 0.04; // Impuestos altos reducen crecimiento
+            gdp += (spending - 50) * 0.03; // Gasto público estimula economía
+            gdp -= (rate - 4) * 0.15; // Tasas altas desincentivan inversión
+            gdp -= (inflation - 2) * 0.1; // Inflación alta afecta crecimiento
+            gdp += (confidence - 3) * 0.2; // Confianza afecta consumo
+            gdp += (trade - 3) * 0.15; // Comercio internacional afecta crecimiento
+            
+            return Math.max(-5, Math.min(10, gdp));
         }
 
-        function calculateStocks(tax, spending, rate) {
+        function calculateStocks(tax, spending, rate, gdp, inflation) {
             const base = 4250;
-            return base + (spending * 10) - (tax * 20) - (rate * 50) + (Math.random() * 100 - 50);
+            let stocks = base;
+            stocks += (gdp - 3) * 100; // Crecimiento afecta bolsa
+            stocks -= (inflation - 2) * 50; // Inflación afecta valor real
+            stocks -= (tax - 25) * 10; // Impuestos afectan ganancias
+            stocks -= (rate - 4) * 30; // Tasas afectan valor presente
+            
+            return Math.max(2000, stocks + (Math.random() * 100 - 50));
         }
 
-        function calculateDeficit(tax, spending) {
-            return -spending + (tax * 2) + (Math.random() * 10 - 5);
+        function calculateDeficit(tax, spending, gdp) {
+            const baseDeficit = -spending + (tax * 2);
+            const gdpEffect = gdp * 0.5; // Mejor crecimiento mejora ingresos
+            return baseDeficit - gdpEffect + (Math.random() * 10 - 5);
         }
 
-        function calculateHousing(rate, inflation) { 
-            return 2.0 - (rate / 2) + (inflation / 2) + (Math.random() - 0.5);
+        function calculateHousing(rate, inflation, gdp) {
+            let housing = 2.0;
+            housing -= (rate - 4) * 0.3; // Tasas altas reducen hipotecas
+            housing += (inflation - 2) * 0.2; // Inflación afecta precios
+            housing += gdp * 0.1; // Crecimiento económico afecta demanda
+            
+            return Math.max(-10, Math.min(15, housing + (Math.random() - 0.5)));
         }
-        //Nunca logre sacarte de mi corazón en estos 3 años, ni de mi mente.
-        function updateIndicators(inflation, unemployment, gdp, stocks, deficit, housing) {
+
+        function calculateExchangeRate(rate, inflation, gdp) {
+            let exchangeRate = 1.00;
+            exchangeRate += (rate - 4) * 0.01; // Tasas altas fortalecen moneda
+            exchangeRate -= (inflation - 2) * 0.02; // Inflación debilita moneda
+            exchangeRate += (gdp - 3) * 0.005; // Crecimiento fortalece moneda
+            
+            return Math.max(0.7, Math.min(1.3, exchangeRate + (Math.random() - 0.5) * 0.02));
+        }
+
+        function updateIndicators(inflation, unemployment, gdp, stocks, deficit, housing, exchangeRate) {
             document.getElementById('inflation').textContent = inflation.toFixed(1) + '%';
             document.getElementById('unemployment').textContent = unemployment.toFixed(1) + '%';
             document.getElementById('gdp-growth').textContent = gdp.toFixed(1) + '%';
             document.getElementById('stock-market').textContent = Math.round(stocks) + ' pts';
             document.getElementById('deficit').textContent = (deficit > 0 ? '+$' : '-$') + Math.abs(deficit).toFixed(0) + 'B';
             document.getElementById('housing').textContent = (housing > 0 ? '+' : '') + housing.toFixed(1) + '%';
+            document.getElementById('exchange-rate').textContent = exchangeRate.toFixed(2) + ' USD';
 
             // Actualizar tendencias
             updateTrend('inflation-trend', inflation, economy.inflation);
@@ -378,7 +499,10 @@
             updateTrend('gdp-trend', gdp, economy.gdpGrowth);
 
             // Guardar estado actual
-            economy = { inflation, unemployment, gdpGrowth: gdp, stockMarket: stocks, deficit, housing };
+            economy = { 
+                inflation, unemployment, gdpGrowth: gdp, 
+                stockMarket: stocks, deficit, housing, exchangeRate 
+            };
         }
 
         function updateTrend(elementId, newValue, oldValue) {
@@ -395,12 +519,64 @@
             }
         }
 
+        function updateEconomicCycle(gdp, inflation) {
+            const cycleElement = document.getElementById('economic-cycle');
+            
+            if (gdp > 4 && inflation < 3) {
+                economicCycle = 'Expansión Fuerte';
+                cycleElement.style.color = '#27ae60';
+            } else if (gdp > 2 && inflation < 4) {
+                economicCycle = 'Expansión';
+                cycleElement.style.color = '#2ecc71';
+            } else if (gdp < 0) {
+                economicCycle = 'Recesión';
+                cycleElement.style.color = '#e74c3c';
+            } else if (inflation > 6) {
+                economicCycle = 'Sobrecalentamiento';
+                cycleElement.style.color = '#f39c12';
+            } else {
+                economicCycle = 'Estabilidad';
+                cycleElement.style.color = '#3498db';
+            }
+            
+            cycleElement.textContent = `Fase: ${economicCycle}`;
+        }
+
+        function updateGDPHistory(gdp) {
+            gdpHistory.push(gdp);
+            if (gdpHistory.length > 8) {
+                gdpHistory.shift();
+            }
+            
+            const historyChart = document.getElementById('gdp-history');
+            historyChart.innerHTML = '';
+            
+            const maxGDP = Math.max(...gdpHistory, 5);
+            const minGDP = Math.min(...gdpHistory, -2);
+            const range = maxGDP - minGDP;
+            
+            gdpHistory.forEach(gdpValue => {
+                const bar = document.createElement('div');
+                bar.className = 'history-bar';
+                const height = ((gdpValue - minGDP) / range) * 90 + 10;
+                bar.style.height = height + 'px';
+                bar.style.background = gdpValue >= 0 ? '#27ae60' : '#e74c3c';
+                historyChart.appendChild(bar);
+            });
+        }
+
         function checkAlerts(inflation, unemployment, gdp) {
             const alertElement = document.getElementById('alert');
-            if (inflation > 5 || unemployment > 8 || gdp < 0) {
+            
+            if (inflation > 8 || unemployment > 12 || gdp < -3) {
                 alertElement.style.display = 'block';
                 alertElement.style.background = '#f8d7da';
                 alertElement.style.color = '#721c24';
+                alertElement.textContent = '🚨 CRISIS ECONÓMICA - Medidas urgentes necesarias';
+            } else if (inflation > 5 || unemployment > 8 || gdp < 0) {
+                alertElement.style.display = 'block';
+                alertElement.style.background = '#fff3cd';
+                alertElement.style.color = '#856404';
                 alertElement.textContent = '⚠️ ¡Cuidado! La economía muestra señales de inestabilidad';
             } else if (inflation < 1 || unemployment < 3) {
                 alertElement.style.display = 'block';
@@ -414,9 +590,17 @@
 
         function nextQuarter() {
             currentQuarter++;
-            document.getElementById('quarter').textContent = `Trimestre ${currentQuarter}`;
+            if (currentQuarter > 4) {
+                currentQuarter = 1;
+                currentYear++;
+            }
             
-            // Añadir efectos acumulativos
+            document.getElementById('quarter').textContent = `Año ${currentYear} - Trimestre ${currentQuarter}`;
+            
+            // Actualizar historia del PIB
+            updateGDPHistory(economy.gdpGrowth);
+            
+            // Simular economía
             simulateEconomy();
             
             // Efecto visual
@@ -428,6 +612,7 @@
 
         // Inicializar
         simulateEconomy();
+        updateGDPHistory(economy.gdpGrowth);
     </script>
 </body>
 </html>
